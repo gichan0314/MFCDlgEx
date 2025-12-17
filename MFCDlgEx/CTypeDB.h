@@ -5,19 +5,16 @@
 #include <afxtempl.h>   // CArray
 
 // CSV 한 줄에 해당하는 글자 정보 구조체
-struct SCharInfo
-{
-    CString m_char;   // 한글 코드 (예: 가, 나)
 
-    int m_sheet;      // 장 번호
-    int m_type;       // 타입 번호
+struct SCharInfo {
+    // 생성자 추가: 모든 멤버를 초기화합니다.
+    SCharInfo() : m_sx(0), m_sy(0), m_width(0), m_height(0),
+        m_sheet(0), m_line(0), m_order(0), m_type(0) {
+    }
 
-    int m_sx;         // 이미지 상의 x
-    int m_sy;         // 이미지 상의 y
-    int m_line;       // 줄 번호
-    int m_order;      // 줄 안에서의 순서
-    int m_width;      // 박스 폭
-    int m_height;     // 박스 높이
+    int m_sx, m_sy, m_width, m_height;
+    int m_sheet, m_line, m_order, m_type;
+    CString m_char; // CString은 자동으로 빈 문자열로 초기화됩니다.
 };
 
 // 글자 DB 클래스

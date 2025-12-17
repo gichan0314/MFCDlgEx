@@ -39,11 +39,11 @@ BOOL CMFCDlgExApp::InitInstance()
     INT_PTR nResponse = dlg.DoModal();
     if (nResponse == IDOK)
     {
-        // TODO: OK 눌렀을 때 처리
+        // TODO: OK 눌렀을 때 UpdateSheetInfo
     }
     else if (nResponse == IDCANCEL)
     {
-        // TODO: Cancel 눌렀을 때 처리
+        // TODO: Cancel 눌렀을 때 UpdateSheetInfo
     }
     else if (nResponse == -1)
     {

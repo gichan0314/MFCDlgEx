@@ -351,6 +351,7 @@ void CMFCDlgExDlg::OnBnClickedButtonOpencsv()
 
 void CMFCDlgExDlg::UpdateSheetInfo()
 {
+    CWaitCursor wait;
     // 1. UI 텍스트 및 스핀 컨트롤 갱신
     SetDlgItemInt(IDC_EDIT_SHEET, m_curSheet, FALSE);
 
@@ -397,33 +398,27 @@ void CMFCDlgExDlg::UpdateSheetInfo()
     // ---------------------------------------------------------
     // ★ [핵심 해결책] 이 부분이 빠져서 창을 흔들어야 했던 겁니다.
     // ---------------------------------------------------------
-    CWnd* pFrame = GetDlgItem(IDC_STATIC_FRAME);
-    if (pFrame)
-    {
-        // 1) "이 영역은 다시 그려야 해"라고 윈도우에게 알림 (FALSE = 깜빡임 방지)
-        pFrame->Invalidate(FALSE);
+    UpdateSheetSummary(m_curSheet);
 
-        // 2) "지금 당장 그려!"라고 명령 (이게 없으면 밍기적거림)
+    // 화면 그리기 명령
+    CWnd* pFrame = GetDlgItem(IDC_STATIC_FRAME);
+    if (pFrame) {
+        pFrame->Invalidate(FALSE);
         pFrame->UpdateWindow();
     }
-
-    // 혹시 모르니 직접 호출도 한 번 해줍니다 (확실한 해결을 위해)
     DrawCurrentSheetBoxes();
 }
-
 
 void CMFCDlgExDlg::OnDeltaposSpinSheet(NMHDR* pNMHDR, LRESULT* pResult)
 {
     LPNMUPDOWN p = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+    // -= 를 += 로 수정
+    m_curSheet += p->iDelta;
 
-    m_curSheet -= p->iDelta;
-    if (m_curSheet < 1)
-        m_curSheet = 1;
-    if (m_curSheet > m_db.m_nSheet && m_db.m_nSheet > 0)
-        m_curSheet = m_db.m_nSheet;
+    if (m_curSheet < 1) m_curSheet = 1;
+    if (m_db.m_nSheet > 0 && m_curSheet > m_db.m_nSheet) m_curSheet = m_db.m_nSheet;
 
     UpdateSheetInfo();
-
     *pResult = 0;
 }
 void CMFCDlgExDlg::DrawCurrentSheetBoxes()
@@ -492,23 +487,14 @@ void CMFCDlgExDlg::DrawCurrentSheetBoxes()
 void CMFCDlgExDlg::OnDeltaposSpinType(NMHDR* pNMHDR, LRESULT* pResult)
 {
     LPNMUPDOWN p = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+    // -= 를 += 로 수정
+    m_curSheet += p->iDelta;
 
-    // ★ [기능 변경] 기존 버튼으로 '장(Sheet)'을 넘기도록 수정
-
-    // 1. 장 번호 변경 (버튼 위/아래에 따라 증감)
-    m_curSheet -= p->iDelta;
-
-    // 2. 범위 제한 (1페이지 ~ 전체 페이지 수)
     if (m_curSheet < 1) m_curSheet = 1;
-    if (m_db.m_nSheet > 0 && m_curSheet > m_db.m_nSheet)
-        m_curSheet = m_db.m_nSheet;
+    if (m_db.m_nSheet > 0 && m_curSheet > m_db.m_nSheet) m_curSheet = m_db.m_nSheet;
 
-    // 3. 화면의 숫자도 장 번호로 즉시 변경
     SetDlgItemInt(IDC_EDIT_TYPE, m_curSheet, FALSE);
-
-    // 4. 화면 갱신 (새로운 페이지 이미지 로드 + 박스 그리기)
     UpdateSheetInfo();
-
     *pResult = 0;
 }
 void CMFCDlgExDlg::UpdateCurrentSheetChars()
